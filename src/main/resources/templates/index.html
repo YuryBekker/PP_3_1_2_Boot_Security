@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div >
+    <h1>Main page</h1>
+    <hr>
+    <a th:href="@{/admin/create}">Create user</a> |
+
+    <a th:href="@{/admin}">List Users</a> |
+    <a th:href="@{/user}">User profile</a> |
+    <th:block th:if="${user == null}">
+        <a th:href="@{/login}">Login</a>
+    </th:block>
+    <th:block th:if="${user != null}">
+        <a th:href="@{/logout}">Logout</a>
+    </th:block>
+    <hr>
+
+</div>
+</body>
+</html>

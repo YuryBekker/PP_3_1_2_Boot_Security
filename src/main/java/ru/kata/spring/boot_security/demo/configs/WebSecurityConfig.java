@@ -1,49 +1,76 @@
 package ru.kata.spring.boot_security.demo.configs;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.kata.spring.boot_security.demo.service.UserService;
+import ru.kata.spring.boot_security.demo.model.Role;
+import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.repository.RoleRepository;
+import ru.kata.spring.boot_security.demo.repository.UserRepository;
+import ru.kata.spring.boot_security.demo.service.UserServiceDetailsImp;
+import ru.kata.spring.boot_security.demo.service.UserServiceImp;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    private final UserService userService;
+    private final UserServiceDetailsImp userServiceDetailsImp;
     private final SuccessUserHandler successUserHandler;
 
-    @Autowired
-    public WebSecurityConfig(UserService userService, SuccessUserHandler successUserHandler) {
-        this.userService = userService;
+    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserServiceDetailsImp userServiceDetailsImp) {
         this.successUserHandler = successUserHandler;
-    }
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        this.userServiceDetailsImp = userServiceDetailsImp;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
+                .antMatchers("/user/**").hasRole("USER")
+                .and()
+                .exceptionHandling().accessDeniedPage("/denied")
                 .and()
                 .formLogin().successHandler(successUserHandler)
                 .permitAll()
                 .and()
-                .logout()
+                .logout().logoutSuccessUrl("/")
                 .permitAll();
+
+
+
     }
-    @Override
-    protected void configure(AuthenticationManagerBuilder managerBuilder) throws Exception {
-        managerBuilder.userDetailsService(userService);
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider(UserServiceImp userServiceImp){
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder());
+        provider.setUserDetailsService(userServiceDetailsImp);
+        return provider;
+    }
+    @Bean
+    //@Transactional
+    public String adminInit(UserRepository userRepository, RoleRepository roleRepository){
+        Role roleAdmin = new Role("ROLE_ADMIN");
+        Role roleUser = new Role("ROLE_USER");
+        User admin = new User(
+                "admin",
+                passwordEncoder().encode("12345"),
+                "admin@gmail.com",
+                Arrays.asList(roleAdmin,roleUser));
+        roleRepository.save(roleAdmin);
+        roleRepository.save(roleUser);
+        userRepository.save(admin);
+        return null;
     }
 }
