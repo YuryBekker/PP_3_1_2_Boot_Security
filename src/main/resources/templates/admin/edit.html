@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Edit</title>
 </head>
 <body>
 <h1>Edit User</h1>
@@ -15,18 +15,22 @@
 <hr>
 <form th:action="@{/admin/create}" method="post">
     <input type="hidden" th:field="*{model.id}">
-    <label>Name</label><br>
-    <input th:field="*{model.username}"><br><br>
-    <label>Password</label><br>
-    <input name="password" placeholder="set a new password"><br><br>
-    <label>Email</label><br>
-    <input th:field="*{model.email}"><br><br>
-    <label>Roles</label><br>
-    <select th:field="*{model.roles}" multiple>
-        <th:block th:each="role : ${roles}">
-            <option th:value="${role.id}" th:text="${role.name}"></option>
-        </th:block>
-    </select><br>
+    <label>
+        <input th:field="*{model.username}" >
+    </label>Username<br><br>
+    <label>
+        <input name="password" placeholder="set a new password">
+    </label>Password<br><br>
+    <label>
+        <input th:field="*{model.email}">
+    </label>Email<br><br>
+    <label>
+        <select th:field="*{model.roles}" multiple>
+            <th:block th:each="role : ${roles}">
+                <p th:value="${role.id}" th:text="${role.name}"></p>
+            </th:block>
+        </select>
+    </label>Roles<br>
     <input type="submit" value="update">
 </form>
 </body>

@@ -20,12 +20,10 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-    private final UserServiceDetailsImp userServiceDetailsImp;
     private final SuccessUserHandler successUserHandler;
 
-    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserServiceDetailsImp userServiceDetailsImp) {
+    public WebSecurityConfig(SuccessUserHandler successUserHandler) {
         this.successUserHandler = successUserHandler;
-        this.userServiceDetailsImp = userServiceDetailsImp;
     }
 
     @Override
@@ -43,34 +41,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout().logoutSuccessUrl("/")
                 .permitAll();
-
-
-
     }
+
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-    @Bean
-    public DaoAuthenticationProvider daoAuthenticationProvider(UserServiceImp userServiceImp){
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(passwordEncoder());
-        provider.setUserDetailsService(userServiceDetailsImp);
-        return provider;
-    }
-    @Bean
-    //@Transactional
-    public String adminInit(UserRepository userRepository, RoleRepository roleRepository){
-        Role roleAdmin = new Role("ROLE_ADMIN");
-        Role roleUser = new Role("ROLE_USER");
-        User admin = new User(
-                "admin",
-                passwordEncoder().encode("12345"),
-                "admin@gmail.com",
-                Arrays.asList(roleAdmin,roleUser));
-        roleRepository.save(roleAdmin);
-        roleRepository.save(roleUser);
-        userRepository.save(admin);
-        return null;
     }
 }

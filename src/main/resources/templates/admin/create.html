@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Create</title>
 </head>
 <body>
 <h1>Create User</h1>
@@ -13,18 +13,22 @@
 <a th:href="@{/logout}">Logout</a>
 <hr>
 <form th:action="@{/admin/create}" method="post">
-    <label>Name</label><br>
-    <input th:field="*{model.username}"><br><br>
-    <label>Password</label><br>
-    <input th:field="*{model.password}"><br><br>
-    <label>Email</label><br>
-    <input th:field="*{model.email}"><br><br>
-    <label>Roles</label><br>
-    <select th:field="*{model.roles}" multiple>
-        <th:block th:each="role : ${model.getRoles()}">
-            <option th:value="${role.id}" th:text="${role.name}"></option>
-        </th:block>
-    </select><br>
+    <label>
+        <input th:field="*{model.username}">
+    </label>Username<br><br>
+    <label>
+        <input th:field="*{model.password}">
+    </label>Password<br><br>
+    <label>
+        <input th:field="*{model.email}">
+    </label>Email<br><br>
+    <label>
+        <select th:field="*{model.roles}" multiple>
+            <th:block th:each="role : ${model.getRoles()}">
+                <p th:value="${role.id}" th:text="${role.name}"></p>
+            </th:block>
+        </select>
+    </label>Roles<br>
     <input type="submit" value="save">
 </form>
 </body>
